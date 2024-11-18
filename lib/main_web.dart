@@ -1,3 +1,4 @@
+import 'package:app/dashboard/admin_login.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'dashboard/dashboard_screen.dart';
@@ -22,7 +23,7 @@ class AdminDashboardApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.deepPurple,
       ),
-      home: DashboardScreen(),
+      home: LoginScreen(),
     );
   }
 }
