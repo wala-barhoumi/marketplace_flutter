@@ -1,6 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'dashboard_screen.dart';  // Adjust the import as per your structure
+import 'dashboard_screen.dart'; // Adjust the import as per your structure
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -18,7 +18,8 @@ class _LoginScreenState extends State<LoginScreen> {
   Future<void> loginUser() async {
     try {
       // Sign in with Firebase Authentication
-      UserCredential userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(
+      UserCredential userCredential =
+          await FirebaseAuth.instance.signInWithEmailAndPassword(
         email: emailController.text,
         password: passwordController.text,
       );
@@ -43,58 +44,89 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Admin Login')),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            // Email input field
-            TextField(
-              controller: emailController,
-              decoration: const InputDecoration(
-                labelText: 'Email',
-                hintText: 'Enter your email',
+      body: Center(
+        child: Container(
+          width: 400, // Set a fixed width for the login form
+          padding: const EdgeInsets.all(16.0),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey.withOpacity(0.5),
+                spreadRadius: 5,
+                blurRadius: 7,
+                offset: const Offset(0, 3), // Shadow position
               ),
-              keyboardType: TextInputType.emailAddress,
-            ),
-            const SizedBox(height: 16),
-            
-            // Password input field
-            TextField(
-              controller: passwordController,
-              decoration: const InputDecoration(
-                labelText: 'Password',
-                hintText: 'Enter your password',
+            ],
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                'Admin Login',
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
               ),
-              obscureText: true,
-            ),
-            const SizedBox(height: 20),
-            
-            // Display error message if any
-            if (errorMessage != null && errorMessage!.isNotEmpty)
-              Text(
-                errorMessage!,
-                style: const TextStyle(color: Colors.red),
-              ),
-            const SizedBox(height: 20),
-            
-            // Login button
-            ElevatedButton(
-              onPressed: loginUser,
-              child: const Text('Login'),
-            ),
-            const SizedBox(height: 16),
+              const SizedBox(height: 20),
 
-            // Optionally, you can add a "Forgot Password" link here:
-            TextButton(
-              onPressed: () {
-                // Add your forgot password functionality here
-              },
-              child: const Text('Forgot Password?'),
-            ),
-          ],
+              // Email input field
+              TextField(
+                controller: emailController,
+                decoration: InputDecoration(
+                  labelText: 'Email',
+                  hintText: 'Enter your email',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                keyboardType: TextInputType.emailAddress,
+              ),
+              const SizedBox(height: 16),
+
+              // Password input field
+              TextField(
+                controller: passwordController,
+                decoration: InputDecoration(
+                  labelText: 'Password',
+                  hintText: 'Enter your password',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                obscureText: true,
+              ),
+              const SizedBox(height: 20),
+
+              // Display error message if any
+              if (errorMessage != null && errorMessage!.isNotEmpty)
+                Text(
+                  errorMessage!,
+                  style: const TextStyle(color: Colors.red),
+                ),
+              const SizedBox(height: 20),
+
+              // Login button
+              SizedBox(
+                width: double.infinity, // Full-width button
+                child: ElevatedButton(
+                  onPressed: loginUser,
+                  child: const Text('Login'),
+                ),
+              ),
+              const SizedBox(height: 16),
+
+              // Forgot Password link
+              TextButton(
+                onPressed: () {
+                  // Add your forgot password functionality here
+                },
+                child: const Text('Forgot Password?'),
+              ),
+            ],
+          ),
         ),
       ),
+      backgroundColor: Colors.grey[200], // Light background color for web
     );
   }
 }
