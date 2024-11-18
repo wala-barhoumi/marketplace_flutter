@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:app/screens/profile_screen.dart'; // ProfileScreen import
 
 class HomeScreen extends StatefulWidget {
+  const HomeScreen({super.key});
+
   @override
   _HomeScreenState createState() => _HomeScreenState();
 }
@@ -15,8 +17,8 @@ class _HomeScreenState extends State<HomeScreen> {
   // List of screens to show based on the selected index
   final List<Widget> _screens = [
     HomeContentScreen(), // Main home content
-    Center(child: Text("Favorites")), // Placeholder for Favorites screen
-    Center(child: Text("Cart")),       // Placeholder for Cart screen
+    const Center(child: Text("Favorites")), // Placeholder for Favorites screen
+    const Center(child: Text("Cart")),       // Placeholder for Cart screen
     ProfileScreen(),  // Link ProfileScreen here
   ];
 
@@ -76,7 +78,7 @@ class _HomeScreenState extends State<HomeScreen> {
             }
           });
         },
-        items: [
+        items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
           BottomNavigationBarItem(icon: Icon(Icons.favorite_border), label: 'Favorites'),
           BottomNavigationBarItem(icon: Icon(Icons.shopping_cart), label: 'Cart'),
@@ -91,6 +93,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
 // Updated HomeContentScreen with address from HomeScreen state
 class HomeContentScreen extends StatelessWidget {
+  const HomeContentScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     // Retrieve the address from the nearest ancestor state (HomeScreen)
@@ -103,12 +107,12 @@ class HomeContentScreen extends StatelessWidget {
         automaticallyImplyLeading: false, // Remove the back arrow
         title: Row(
           children: [
-            Icon(Icons.location_on, color: Colors.blue, size: 20),  // Smaller icon size
-            SizedBox(width: 5),
+            const Icon(Icons.location_on, color: Colors.blue, size: 20),  // Smaller icon size
+            const SizedBox(width: 5),
             Expanded(
               child: Text(
                 'Delivery: $deliveryAddress',  // Display the address
-                style: TextStyle(color: Colors.black, fontSize: 12),  // Smaller font size
+                style: const TextStyle(color: Colors.black, fontSize: 12),  // Smaller font size
                 overflow: TextOverflow.ellipsis,
               ),
             ),
@@ -116,7 +120,7 @@ class HomeContentScreen extends StatelessWidget {
         ),
         actions: [
           IconButton(
-            icon: Icon(Icons.notifications_outlined, color: Colors.black, size: 20),  // Smaller icon size
+            icon: const Icon(Icons.notifications_outlined, color: Colors.black, size: 20),  // Smaller icon size
             onPressed: () {},
           ),
         ],
@@ -130,13 +134,13 @@ class HomeContentScreen extends StatelessWidget {
             TextField(
               decoration: InputDecoration(
                 labelText: 'Search...',
-                prefixIcon: Icon(Icons.search, size: 18),  // Smaller icon size
+                prefixIcon: const Icon(Icons.search, size: 18),  // Smaller icon size
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(30.0), // Rounded corners
                 ),
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(30.0),
-                  borderSide: BorderSide(
+                  borderSide: const BorderSide(
                     color: Colors.grey, // Color of the border
                   ),
                 ),
@@ -148,11 +152,11 @@ class HomeContentScreen extends StatelessWidget {
                 ),
               ),
             ),
-            SizedBox(height: 15), // Reduced spacing after the search bar
+            const SizedBox(height: 15), // Reduced spacing after the search bar
             _buildHighlightProduct(),
-            SizedBox(height: 15),
+            const SizedBox(height: 15),
             _buildPopularCategories(),
-            SizedBox(height: 15),
+            const SizedBox(height: 15),
             _buildProductGrid(),
           ],
         ),
@@ -162,7 +166,7 @@ class HomeContentScreen extends StatelessWidget {
 
   Widget _buildHighlightProduct() {
     return Container(
-      padding: EdgeInsets.all(8),
+      padding: const EdgeInsets.all(8),
       decoration: BoxDecoration(
         color: Colors.pink.shade50,
         borderRadius: BorderRadius.circular(12),
@@ -175,34 +179,34 @@ class HomeContentScreen extends StatelessWidget {
             height: 90,  // Reduced image size
             fit: BoxFit.cover,
           ),
-          SizedBox(width: 12),
+          const SizedBox(width: 12),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
+              const Text(
                 'Rose Hibiscus Mist',
                 style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),  // Smaller font size
               ),
-              Text(
-                '\36.00',
+              const Text(
+                '36.00',
                 style: TextStyle(fontSize: 12, color: Colors.grey, decoration: TextDecoration.lineThrough),
               ),
-              Text(
-                '\34.20',
+              const Text(
+                '34.20',
                 style: TextStyle(fontSize: 16, color: Colors.black, fontWeight: FontWeight.bold),
               ),
-              SizedBox(height: 6),
+              const SizedBox(height: 6),
               ElevatedButton(
-                onPressed: () {},
-                child: Text('Add to Cart', style: TextStyle(fontSize: 12)),  // Smaller text
+                onPressed: () {},  // Smaller text
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.blue,
                   foregroundColor: Colors.white,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  padding: EdgeInsets.symmetric(horizontal: 10, vertical: 6),  // Reduced padding
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),  // Reduced padding
                 ),
+                child: Text('Add to Cart', style: TextStyle(fontSize: 12)),
               ),
             ],
           ),
@@ -217,7 +221,7 @@ class HomeContentScreen extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
+            const Text(
               'Popular categories',
               style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),  // Smaller font size
             ),
@@ -225,14 +229,14 @@ class HomeContentScreen extends StatelessWidget {
               onTap: () {
                 // Handle 'See all' navigation
               },
-              child: Text(
+              child: const Text(
                 'See all',
                 style: TextStyle(color: Colors.blue, fontSize: 12),  // Smaller font size
               ),
             ),
           ],
         ),
-        SizedBox(height: 8),  // Reduced spacing
+        const SizedBox(height: 8),  // Reduced spacing
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
@@ -254,8 +258,8 @@ class HomeContentScreen extends StatelessWidget {
           backgroundColor: Colors.grey.shade200,
           child: Icon(iconData, color: Colors.black, size: 18),  // Smaller icon size
         ),
-        SizedBox(height: 5),
-        Text(label, style: TextStyle(fontSize: 10)),  // Smaller font size
+        const SizedBox(height: 5),
+        Text(label, style: const TextStyle(fontSize: 10)),  // Smaller font size
       ],
     );
   }
@@ -266,7 +270,7 @@ class HomeContentScreen extends StatelessWidget {
       crossAxisSpacing: 8,  // Reduced spacing
       mainAxisSpacing: 8,  // Reduced spacing
       shrinkWrap: true,
-      physics: NeverScrollableScrollPhysics(),
+      physics: const NeverScrollableScrollPhysics(),
       children: [
         _buildProductCard('Moisturising tonic', 'lib/assets/tonic.jpg', '\$27.90'),
         _buildProductCard('Facial moisturiser', 'lib/assets/moisturiser.jpg', '\$45.50'),
@@ -278,7 +282,7 @@ class HomeContentScreen extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12),
-        boxShadow: [BoxShadow(color: Colors.grey.shade200, blurRadius: 8, offset: Offset(0, 4))],
+        boxShadow: [BoxShadow(color: Colors.grey.shade200, blurRadius: 8, offset: const Offset(0, 4))],
         color: Colors.white,
       ),
       child: Column(
@@ -290,8 +294,8 @@ class HomeContentScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(name, style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),  // Smaller font size
-                Text(price, style: TextStyle(fontSize: 12, color: Colors.grey)),  // Smaller font size
+                Text(name, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),  // Smaller font size
+                Text(price, style: const TextStyle(fontSize: 12, color: Colors.grey)),  // Smaller font size
               ],
             ),
           ),

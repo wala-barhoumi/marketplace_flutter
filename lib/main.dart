@@ -26,7 +26,7 @@ void main() async {
       // Firebase initialization for mobile
       await Firebase.initializeApp();
     }
-    runApp(MyApp());
+    runApp(const MyApp());
   } catch (e) {
     // Log or handle initialization error
     debugPrint('Firebase initialization failed: $e');
@@ -45,8 +45,8 @@ class MyApp extends StatelessWidget {
       ),
       initialRoute: '/',
       routes: {
-        '/': (context) => LoginScreen(),
-        '/signup': (context) => SignupScreen(),
+        '/': (context) => const LoginScreen(),
+        '/signup': (context) => const SignupScreen(),
         '/home':(context)=>HomeScreen(),
       },
     );

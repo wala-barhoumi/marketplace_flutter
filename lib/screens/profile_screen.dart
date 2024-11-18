@@ -5,6 +5,8 @@ import 'package:firebase_auth/firebase_auth.dart'; // Import Firebase Auth packa
 import 'package:cloud_firestore/cloud_firestore.dart'; // Import Firestore package
 
 class ProfileScreen extends StatefulWidget {
+  const ProfileScreen({super.key});
+
   @override
   _ProfileScreenState createState() => _ProfileScreenState();
 }
@@ -54,7 +56,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         backgroundColor: Colors.white,
         elevation: 0,
         automaticallyImplyLeading: false, // Ensures no back arrow is displayed
-        title: Text(
+        title: const Text(
           'Profile',
           style: TextStyle(color: Colors.black),
         ),
@@ -66,37 +68,37 @@ class _ProfileScreenState extends State<ProfileScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Profile Picture Section
-            Center(
+            const Center(
               child: CircleAvatar(
                 radius: 50,
                 backgroundImage: AssetImage('lib/assets/profile_picture.jpg'), // Replace with actual image
               ),
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             // Profile Name and Email (Fetched from Firestore)
             Center(
               child: Column(
                 children: [
                   Text(
                     username.isNotEmpty ? username : 'Loading...', // Show dynamic name or loading state
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                    style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
                   Text(
                     email.isNotEmpty ? email : 'Loading...', // Show dynamic email or loading state
-                    style: TextStyle(color: Colors.grey),
+                    style: const TextStyle(color: Colors.grey),
                   ),
                 ],
               ),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             // Account Settings Section
-            Text(
+            const Text(
               'Account Settings',
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             ListTile(
-              leading: Icon(Icons.edit),
-              title: Text('Edit Profile'),
+              leading: const Icon(Icons.edit),
+              title: const Text('Edit Profile'),
               onTap: () async {
                 // Navigate to EditProfileScreen and refresh on return
                 bool? dataUpdated = await Navigator.push(
@@ -111,8 +113,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
               },
             ),
             ListTile(
-              leading: Icon(Icons.lock),
-              title: Text('Change Password'),
+              leading: const Icon(Icons.lock),
+              title: const Text('Change Password'),
               onTap: () {
                 Navigator.push(
                   context,
@@ -121,15 +123,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
               },
             ),
             ListTile(
-              leading: Icon(Icons.notifications),
-              title: Text('Notifications'),
+              leading: const Icon(Icons.notifications),
+              title: const Text('Notifications'),
               onTap: () {
                 // Handle notifications settings action
               },
             ),
             ListTile(
-              leading: Icon(Icons.logout),
-              title: Text('Log Out'),
+              leading: const Icon(Icons.logout),
+              title: const Text('Log Out'),
               onTap: () {
                 signout(); // Call the signout method when "Log Out" is tapped
                 Navigator.pop(context); // Optionally, navigate back after sign-out

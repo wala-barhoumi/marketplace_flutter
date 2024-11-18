@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class ChangePasswordScreen extends StatefulWidget {
+  const ChangePasswordScreen({super.key});
+
   @override
   _ChangePasswordScreenState createState() => _ChangePasswordScreenState();
 }
@@ -11,9 +13,9 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
   final _formKey = GlobalKey<FormState>();
 
   // Controllers
-  TextEditingController _currentPasswordController = TextEditingController();
-  TextEditingController _newPasswordController = TextEditingController();
-  TextEditingController _confirmPasswordController = TextEditingController();
+  final TextEditingController _currentPasswordController = TextEditingController();
+  final TextEditingController _newPasswordController = TextEditingController();
+  final TextEditingController _confirmPasswordController = TextEditingController();
 
   bool _isLoading = false;
 
@@ -65,7 +67,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Change Password'),
+        title: const Text('Change Password'),
         backgroundColor: Colors.purple,
       ),
       body: Padding(
@@ -76,7 +78,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
             children: [
               TextFormField(
                 controller: _currentPasswordController,
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   labelText: 'Current Password',
                   prefixIcon: Icon(Icons.lock),
                 ),
@@ -89,10 +91,10 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                   return null;
                 },
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               TextFormField(
                 controller: _newPasswordController,
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   labelText: 'New Password',
                   prefixIcon: Icon(Icons.lock_open),
                 ),
@@ -107,10 +109,10 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                   return null;
                 },
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               TextFormField(
                 controller: _confirmPasswordController,
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   labelText: 'Confirm New Password',
                   prefixIcon: Icon(Icons.lock_outline),
                 ),
@@ -125,15 +127,15 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                   return null;
                 },
               ),
-              SizedBox(height: 30),
+              const SizedBox(height: 30),
               _isLoading
-                  ? Center(child: CircularProgressIndicator())
+                  ? const Center(child: CircularProgressIndicator())
                   : ElevatedButton.icon(
                       onPressed: _changePassword,
-                      icon: Icon(Icons.save),
-                      label: Text('Update Password'),
+                      icon: const Icon(Icons.save),
+                      label: const Text('Update Password'),
                       style: ElevatedButton.styleFrom(
-                        padding: EdgeInsets.symmetric(vertical: 15),
+                        padding: const EdgeInsets.symmetric(vertical: 15),
                         backgroundColor: Colors.white,
                         foregroundColor: Colors.black,
                       ),

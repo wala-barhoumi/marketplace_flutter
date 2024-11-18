@@ -3,6 +3,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class EditProfileScreen extends StatefulWidget {
+  const EditProfileScreen({super.key});
+
   @override
   _EditProfileScreenState createState() => _EditProfileScreenState();
 }
@@ -52,7 +54,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             'username': usernameController.text,
           });
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Profile updated successfully')),
+            const SnackBar(content: Text('Profile updated successfully')),
           );
           Navigator.pop(context, true);
         }
@@ -68,7 +70,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
+        title: const Text(
           'Edit Profile',
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
@@ -77,7 +79,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         shadowColor: Colors.purple,
       ),
       body: _isLoading
-          ? Center(child: CircularProgressIndicator())
+          ? const Center(child: CircularProgressIndicator())
           : SingleChildScrollView(
               padding: const EdgeInsets.all(20.0),
               child: Form(
@@ -95,17 +97,17 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                           children: [
                             _buildTextField(
                                 emailController, 'Email', Icons.email),
-                            SizedBox(height: 16),
+                            const SizedBox(height: 16),
                             _buildTextField(
                                 usernameController, 'Username', Icons.person),
-                            SizedBox(height: 16),
+                            const SizedBox(height: 16),
                             _buildTextField(
                                 addressController, 'Address', Icons.home),
                           ],
                         ),
                       ),
                     ),
-                    SizedBox(height: 24),
+                    const SizedBox(height: 24),
                     Center(
                       child: ElevatedButton(
                         style: ElevatedButton.styleFrom(
@@ -113,11 +115,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(20),
                           ),
-                          padding: EdgeInsets.symmetric(
+                          padding: const EdgeInsets.symmetric(
                               horizontal: 40, vertical: 15),
                         ),
                         onPressed: updateProfile,
-                        child: Text(
+                        child: const Text(
                           'Save Changes',
                           style: TextStyle(fontSize: 18, color: Colors.white),
                         ),
