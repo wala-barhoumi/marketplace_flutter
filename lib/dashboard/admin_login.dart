@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'dashboard_screen.dart'; // Adjust the import as per your structure
 
 class LoginScreen extends StatefulWidget {
@@ -14,6 +15,26 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController passwordController = TextEditingController();
   String? errorMessage = ''; // Used to display error messages
 
+  @override
+  void initState() {
+    super.initState();
+    _checkLoginStatus(); // Check login status when the widget is initialized
+  }
+
+  // Method to check if the user is already logged in
+  Future<void> _checkLoginStatus() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    bool? isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
+
+    if (isLoggedIn) {
+      // If the user is logged in, navigate to the Dashboard
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const DashboardScreen()),
+      );
+    }
+  }
+
   // Firebase sign-in method
   Future<void> loginUser() async {
     try {
@@ -24,8 +45,12 @@ class _LoginScreenState extends State<LoginScreen> {
         password: passwordController.text,
       );
 
-      // If sign-in is successful, navigate to the Dashboard
       if (userCredential.user != null) {
+        // Save the login state
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        prefs.setBool('isLoggedIn', true);
+
+        // Navigate to the Dashboard
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => const DashboardScreen()),

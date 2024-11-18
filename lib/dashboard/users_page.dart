@@ -24,10 +24,12 @@ class _UsersPageState extends State<UsersPage> {
       // Get users from Firestore collection
       QuerySnapshot querySnapshot = await _firestore.collection('users').get();
 
-      // Convert Firestore documents into a List of Maps
-      return querySnapshot.docs
-          .map((doc) => doc.data() as Map<String, dynamic>)
-          .toList();
+      // Convert Firestore documents into a List of Maps, including the document ID
+      return querySnapshot.docs.map((doc) {
+        var data = doc.data() as Map<String, dynamic>;
+        data['id'] = doc.id; // Add the document ID to the data
+        return data;
+      }).toList();
     } catch (e) {
       print('Error fetching users: $e');
       return [];
@@ -79,7 +81,7 @@ class _UsersPageState extends State<UsersPage> {
               var user = users[index];
               return ListTile(
                 leading: const Icon(Icons.person), // Icon for user
-                title: Text(user['username'] ?? 'No username'),  // Display username
+                title: Text(user['username'] ?? 'No username'), // Display username
                 subtitle: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -180,7 +182,10 @@ class _EditUserPageState extends State<EditUserPage> {
   // Update user data
   Future<void> updateUser() async {
     try {
-      await FirebaseFirestore.instance.collection('users').doc(widget.user['id']).update({
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(widget.user['id']) // Use the correct document ID
+          .update({
         'username': _usernameController.text,
         'email': _emailController.text,
         'address': _addressController.text,
