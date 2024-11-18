@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "217118730456",
+    "firebase_url": "https://marketplace-flutter-b74b7-default-rtdb.firebaseio.com",
+    "project_id": "marketplace-flutter-b74b7",
+    "storage_bucket": "marketplace-flutter-b74b7.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:217118730456:android:ab2c11b2e0f5ddecd8cfad",
+        "android_client_info": {
+          "package_name": "com.example.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBiaH3-aopTVbCwB0No-2Ljl1d4-Jc6wzw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
