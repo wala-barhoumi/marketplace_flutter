@@ -38,6 +38,7 @@ dependencies:
   cupertino_icons: ^1.0.8
   cloud_firestore: ^5.5.0
   shared_preferences: ^2.3.3
+  google_sign_in: ^6.2.2
 
 dev_dependencies:
   flutter_test:
@@ -65,6 +66,7 @@ flutter:
     - lib/assets/tonic.jpg
     - lib/assets/moisturiser.jpg
     - lib/assets/profile_picture.jpg
+    - lib/assets/google.png
     - lib/assets/login_image.png
     - lib/assets/rose_hibiscus_mist.png
 

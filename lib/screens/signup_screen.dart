@@ -169,7 +169,7 @@ class _SignupScreenState extends State<SignupScreen> {
           'address': _address.text,
           'createdAt': FieldValue.serverTimestamp(),  // Optional: Add timestamp when account is created
         });
-        Navigator.pushNamed(context, '/login'); // Navigate to home screen after successful sign-up
+        Navigator.pushNamed(context, '/login');
       }
     } catch (e) {
       log("Error during sign-up: $e");

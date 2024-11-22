@@ -24,17 +24,13 @@ class ProductPage extends StatelessWidget {
                 ),
                 ElevatedButton(
                   onPressed: () {
-                    // Add action to navigate to a page to add a new product
-                    // You can create a separate page or modal to add a product.
+                  
                   },
                   child: const Text('Add Product'),
                 ),
               ],
             ),
             const SizedBox(height: 20),
-
-            // Product List - In this example, we're using a hardcoded list of products.
-            // Replace this with dynamic data (e.g., from Firebase or an API).
             Expanded(
               child: ListView.builder(
                 itemCount: 5, // Update this with the number of products
@@ -43,8 +39,8 @@ class ProductPage extends StatelessWidget {
                     margin: const EdgeInsets.symmetric(vertical: 8),
                     child: ListTile(
                       leading: Icon(Icons.shopping_bag, size: 40), // Placeholder for product image
-                      title: Text('Product ${index + 1}'), // Product Name
-                      subtitle: Text('Price: \$${(index + 1) * 10}'), // Product Price
+                      title: Text('Product '), // Product Name
+                      subtitle: Text('Price: '), // Product Price
                       onTap: () {
                         // Navigate to the product details page (optional)
                       },
