@@ -1,5 +1,7 @@
 import 'dart:developer';
+import 'package:app/screens/home_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'auth_service.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -19,6 +21,22 @@ class _LoginScreenState extends State<LoginScreen> {
     _email.dispose();
     _password.dispose();
     super.dispose();
+  }
+  @override
+  void initState() {
+    // TODO: implement initState
+      Future.delayed(Duration(seconds: 0), () async {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      bool isLoggedIn = prefs.getBool('isLogged') ?? false; 
+
+      if (isLoggedIn) {
+       
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => HomeScreen()),
+        );
+      } 
+    });
   }
 
   @override
@@ -116,7 +134,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   height: 24,
                   width: 24,
                 ),
-                label: const Text('Sign in with Google'),
+                label: const Text('Google'),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.white,
                   foregroundColor: Colors.black,

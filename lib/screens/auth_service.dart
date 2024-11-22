@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthService {
   final _auth = FirebaseAuth.instance;
@@ -49,17 +50,32 @@ class AuthService {
 
   Future<User?> signInWithGoogle() async {
     try {
+      // Ensure the user is signed out first
+      await _googleSignIn.signOut();
+
+      // Start Google Sign-In
       final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
-      if (googleUser == null) return null;
+      if (googleUser == null) {
+        // Sign-in aborted by the user
+        return null;
+      }
 
       final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
 
+      // Create credential for Firebase
       final AuthCredential credential = GoogleAuthProvider.credential(
         accessToken: googleAuth.accessToken,
         idToken: googleAuth.idToken,
       );
 
+      // Sign in to Firebase with the Google credentials
       final UserCredential userCredential = await _auth.signInWithCredential(credential);
+
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    pref.setString('email', googleUser.email);
+    pref.setBool("isLogged", true);
+
+      log("Google Sign-In successful: (${googleUser.email})");
       return userCredential.user;
     } catch (e) {
       log("Google Sign-In Error: $e");
@@ -75,4 +91,9 @@ class AuthService {
       log("Something went wrong during sign-out");
     }
   }
+  Future<void> signOut() async {
+  await _googleSignIn.signOut();
+  await _auth.signOut();
+}
+
 }
