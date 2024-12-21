@@ -47,6 +47,7 @@ class AuthService {
     }
     return null;
   }
+  
 
   Future<User?> signInWithGoogle() async {
     try {
@@ -71,9 +72,6 @@ class AuthService {
       // Sign in to Firebase with the Google credentials
       final UserCredential userCredential = await _auth.signInWithCredential(credential);
 
-    SharedPreferences pref = await SharedPreferences.getInstance();
-    pref.setString('email', googleUser.email);
-    pref.setBool("isLogged", true);
 
       log("Google Sign-In successful: (${googleUser.email})");
       return userCredential.user;

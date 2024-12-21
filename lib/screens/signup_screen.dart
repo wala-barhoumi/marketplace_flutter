@@ -150,29 +150,35 @@ class _SignupScreenState extends State<SignupScreen> {
     );
   }
 
-  Future<void> _signup() async {
-    try {
-      final user = await _auth.createUserWithEmailAndPassword(
-        _email.text,
-        _password.text,
-        _name.text,      // Pass the username
-        _address.text,
-      );
+ Future<void> _signup() async {
+  try {
+    final user = await _auth.createUserWithEmailAndPassword(
+      _email.text,
+      _password.text,
+      _name.text,      // Pass the username
+      _address.text,
+    );
 
-      if (user != null) {
-        // After creating the user in Firebase Authentication, store additional info in Firestore.
-        final userRef = FirebaseFirestore.instance.collection('users').doc(user.uid);
+    if (user != null) {
+      // Reference to the Firestore document for the user
+      final userRef = FirebaseFirestore.instance.collection('users').doc(user.uid);
 
-        await userRef.set({
-          'username': _name.text,
-          'email': _email.text,
-          'address': _address.text,
-          'createdAt': FieldValue.serverTimestamp(),  // Optional: Add timestamp when account is created
-        });
-        Navigator.pushNamed(context, '/login');
-      }
-    } catch (e) {
-      log("Error during sign-up: $e");
+      // Add user details to Firestore, including the 'role'
+      await userRef.set({
+        'username': _name.text,
+        'email': _email.text,
+        'address': _address.text,
+        'role': 'user',  // Assign the 'user' role
+        'createdAt': FieldValue.serverTimestamp(),  // Optional: Add timestamp when account is created
+      });
+
+      // Navigate to the desired route after successful signup
+      Navigator.pushNamed(context, '/');
     }
+  } catch (e) {
+    // Log the error in case of failure
+    log("Error during sign-up: $e");
   }
+}
+
 }

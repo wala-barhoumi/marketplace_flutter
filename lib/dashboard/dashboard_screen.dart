@@ -26,8 +26,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(60.0),
+      appBar: const PreferredSize(
+        preferredSize: Size.fromHeight(60.0),
         child: Navbar(),
       ),
       body: Row(

@@ -1,7 +1,6 @@
 import 'dart:developer';
 import 'package:app/screens/home_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'auth_service.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -22,23 +21,6 @@ class _LoginScreenState extends State<LoginScreen> {
     _password.dispose();
     super.dispose();
   }
-  @override
-  void initState() {
-    // TODO: implement initState
-      Future.delayed(Duration(seconds: 0), () async {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      bool isLoggedIn = prefs.getBool('isLogged') ?? false; 
-
-      if (isLoggedIn) {
-       
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => HomeScreen()),
-        );
-      } 
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -121,30 +103,6 @@ class _LoginScreenState extends State<LoginScreen> {
                   style: TextStyle(color: Colors.blue, fontSize: 14),
                 ),
               ),
-              const SizedBox(height: 15),
-              const Text(
-                'OR',
-                style: TextStyle(fontSize: 14, color: Colors.grey),
-              ),
-              const SizedBox(height: 15),
-              ElevatedButton.icon(
-                onPressed: _googleSignIn,
-                icon: Image.asset(
-                  'lib/assets/google.png',
-                  height: 24,
-                  width: 24,
-                ),
-                label: const Text('Google'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.white,
-                  foregroundColor: Colors.black,
-                  side: const BorderSide(color: Colors.grey),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-                ),
-              ),
             ],
           ),
         ),
@@ -160,14 +118,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
     if (user != null) {
       log("User Logged In");
-      Navigator.pushNamed(context, '/home');
-    }
-  }
-
-  Future<void> _googleSignIn() async {
-    final user = await _auth.signInWithGoogle();
-    if (user != null) {
-      log("Google User Logged In");
       Navigator.pushNamed(context, '/home');
     }
   }

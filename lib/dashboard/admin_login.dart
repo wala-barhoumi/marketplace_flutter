@@ -68,87 +68,96 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Admin Login')),
+      appBar: AppBar(title: const Text('Admin Panel')),
       body: Center(
-        child: Container(
-          width: 400, // Set a fixed width for the login form
-          padding: const EdgeInsets.all(16.0),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(12),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.grey.withOpacity(0.5),
-                spreadRadius: 5,
-                blurRadius: 7,
-                offset: const Offset(0, 3), // Shadow position
-              ),
-            ],
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Text(
-                'Admin Login',
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 20),
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            // Determine the width dynamically based on screen size
+            double containerWidth = constraints.maxWidth > 600
+                ? 400
+                : constraints.maxWidth * 0.9;
 
-              // Email input field
-              TextField(
-                controller: emailController,
-                decoration: InputDecoration(
-                  labelText: 'Email',
-                  hintText: 'Enter your email',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
+            return Container(
+              width: containerWidth,
+              padding: const EdgeInsets.all(16.0),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.5),
+                    spreadRadius: 5,
+                    blurRadius: 7,
+                    offset: const Offset(0, 3), // Shadow position
                   ),
-                ),
-                keyboardType: TextInputType.emailAddress,
+                ],
               ),
-              const SizedBox(height: 16),
-
-              // Password input field
-              TextField(
-                controller: passwordController,
-                decoration: InputDecoration(
-                  labelText: 'Password',
-                  hintText: 'Enter your password',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Text(
+                    'Admin Login',
+                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                   ),
-                ),
-                obscureText: true,
-              ),
-              const SizedBox(height: 20),
+                  const SizedBox(height: 20),
 
-              // Display error message if any
-              if (errorMessage != null && errorMessage!.isNotEmpty)
-                Text(
-                  errorMessage!,
-                  style: const TextStyle(color: Colors.red),
-                ),
-              const SizedBox(height: 20),
+                  // Email input field
+                  TextField(
+                    controller: emailController,
+                    decoration: InputDecoration(
+                      labelText: 'Email',
+                      hintText: 'Enter your email',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    keyboardType: TextInputType.emailAddress,
+                  ),
+                  const SizedBox(height: 16),
 
-              // Login button
-              SizedBox(
-                width: double.infinity, // Full-width button
-                child: ElevatedButton(
-                  onPressed: loginUser,
-                  child: const Text('Login'),
-                ),
-              ),
-              const SizedBox(height: 16),
+                  // Password input field
+                  TextField(
+                    controller: passwordController,
+                    decoration: InputDecoration(
+                      labelText: 'Password',
+                      hintText: 'Enter your password',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    obscureText: true,
+                  ),
+                  const SizedBox(height: 20),
 
-              // Forgot Password link
-              TextButton(
-                onPressed: () {
-                  // Add your forgot password functionality here
-                },
-                child: const Text('Forgot Password?'),
+                  // Display error message if any
+                  if (errorMessage != null && errorMessage!.isNotEmpty)
+                    Text(
+                      errorMessage!,
+                      style: const TextStyle(color: Colors.red),
+                    ),
+                  const SizedBox(height: 20),
+
+                  // Login button
+                  SizedBox(
+                    width: double.infinity, // Full-width button
+                    child: ElevatedButton(
+                      onPressed: loginUser,
+                      child: const Text('Login'),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Forgot Password link
+                  TextButton(
+                    onPressed: () {
+                      // Add your forgot password functionality here
+                    },
+                    child: const Text('Forgot Password?'),
+                  ),
+                ],
               ),
-            ],
-          ),
+            );
+          },
         ),
       ),
       backgroundColor: Colors.grey[200], // Light background color for web

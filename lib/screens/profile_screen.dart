@@ -103,7 +103,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 // Navigate to EditProfileScreen and refresh on return
                 bool? dataUpdated = await Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => EditProfileScreen()),
+                  MaterialPageRoute(builder: (context) => const EditProfileScreen()),
                 );
 
                 // If data was updated, refresh the profile data
@@ -118,7 +118,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => ChangePasswordScreen()),
+                  MaterialPageRoute(builder: (context) => const ChangePasswordScreen()),
                 );
               },
             ),
