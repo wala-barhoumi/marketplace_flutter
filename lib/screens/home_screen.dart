@@ -335,7 +335,7 @@ class _HomeContentScreenState extends State<HomeContentScreen> {
                 ),
                 IconButton(
                   onPressed: () {
-                    _addToCart(productId);
+                    _addToCart(productId,name,price,image);
                   },
                   icon: const Icon(Icons.card_giftcard, size: 24, color: Colors.blue),
                 ),
@@ -384,43 +384,51 @@ class _HomeContentScreenState extends State<HomeContentScreen> {
     }
   }
 
-  void _addToCart(String productId) async {
-    final currentUser = FirebaseAuth.instance.currentUser;
+ void _addToCart(String productId, String name, String price, String image) async {
+  final currentUser = FirebaseAuth.instance.currentUser;
 
-    if (currentUser == null) {
+  if (currentUser == null) {
+    if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Veuillez vous connecter pour ajouter au panier')),
       );
-      return;
     }
+    return;
+  }
 
-    final cartRef = FirebaseFirestore.instance
-        .collection('users')
-        .doc(currentUser.uid)
-        .collection('cart');
+  final cartRef = FirebaseFirestore.instance
+      .collection('users')
+      .doc(currentUser.uid)
+      .collection('cart');
 
-    final doc = await cartRef.doc(productId).get();
+  final doc = await cartRef.doc(productId).get();
 
-    if (doc.exists) {
-      await cartRef.doc(productId).update({
-        'quantity': FieldValue.increment(1),
-      });
+  if (doc.exists) {
+    await cartRef.doc(productId).update({
+      'quantity': FieldValue.increment(1),
+    });
+    if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Quantité du produit augmentée')),
       );
-    } else {
-      await cartRef.doc(productId).set({
-        'productId': productId,
-        'quantity': 1,
-        'timestamp': FieldValue.serverTimestamp(),
-      });
+    }
+  } else {
+    await cartRef.doc(productId).set({
+      'productId': productId,
+      'quantity': 1,
+      'timestamp': FieldValue.serverTimestamp(),
+      'name': name,
+      'image': image,
+      'price': price,
+    });
+    if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Produit ajouté au panier')),
       );
     }
   }
 }
-
+}
 String cleanBase64(String base64String) {
    print(" base64String");
    print(base64String);

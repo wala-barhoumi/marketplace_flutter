@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:app/firestore_services.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -37,16 +38,16 @@ class CartScreen extends StatelessWidget {
                 );
               }
 
-              final productId = data['productId']; // Assuming 'productId' is stored
+              final productId = data['productId']; 
               final name = data['name'] ?? 'Unknown product';
               final price = data['price'] ?? 'Unknown price';
-              final image = data['image'] ?? '';
+              final image = base64Decode(data['image'] ?? '');
 
               return ListTile(
                 title: Text(name),
                 subtitle: Text(price),
                 leading: image.isNotEmpty
-                    ? Image.network(image, width: 50, height: 50, fit: BoxFit.cover)
+                    ? Image.memory(image, width: 50, height: 50, fit: BoxFit.cover)
                     : Icon(Icons.image, size: 50),
                 onTap: () {
                   // Navigate to product details screen
