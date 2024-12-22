@@ -84,4 +84,6 @@ class FirestoreService {
       rethrow; // Rethrow the error so it can be caught where this function is called
     }
   }
+
+  fetchUserFavorites(userId) {}
 }

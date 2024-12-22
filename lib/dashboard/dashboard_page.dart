@@ -1,29 +1,36 @@
+import 'package:async/async.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fl_chart/fl_chart.dart';
 
 class DashboardPage extends StatelessWidget {
   const DashboardPage({super.key});
+  Stream<Map<String, int>> getStatsStream() {
+    final userStream = FirebaseFirestore.instance.collection('users').snapshots().map((snapshot) => snapshot.size);
+    final productStream = FirebaseFirestore.instance.collection('products').snapshots().map((snapshot) => snapshot.size);
+    final orderStream = FirebaseFirestore.instance.collection('orders').snapshots().map((snapshot) => snapshot.size);
 
-  // This method counts the documents in a Firestore collection
-  Future<int> getDocumentCount(String collectionName) async {
-    CollectionReference collectionRef = FirebaseFirestore.instance.collection(collectionName);
-    QuerySnapshot snapshot = await collectionRef.get();
-    return snapshot.size;
+    return StreamZip([userStream, productStream, orderStream]).map((values) {
+      return {
+        'users': values[0],
+        'products': values[1],
+        'orders': values[2],
+      };
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F5), // Light background color
+      backgroundColor: const Color(0xFFF5F5F5), 
       appBar: AppBar(
         backgroundColor: const Color(0xFFFFFFFF),
         title: const Text('Admin Dashboard', style: TextStyle(color: Colors.black)),
         iconTheme: const IconThemeData(color: Colors.black),
         elevation: 1,
       ),
-      body: FutureBuilder<Map<String, int>>(
-        future: _getStats(),
+      body: StreamBuilder<Map<String, int>>(
+        stream: getStatsStream(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
@@ -56,18 +63,6 @@ class DashboardPage extends StatelessWidget {
         },
       ),
     );
-  }
-
-  Future<Map<String, int>> _getStats() async {
-    final userCount = await getDocumentCount('users');
-    final productCount = await getDocumentCount('products');
-    final orderCount = await getDocumentCount('orders');
-
-    return {
-      'users': userCount,
-      'products': productCount,
-      'orders': orderCount,
-    };
   }
 
   Widget _buildStatCard(String title, int value, Color color) {

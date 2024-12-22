@@ -66,7 +66,7 @@ class _UsersPageState extends State<UsersPage> {
         ],
       ),
       body: StreamBuilder<List<Map<String, dynamic>>>(
-        stream: getUsersStream(), // Stream of user data
+        stream: getUsersStream(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
@@ -82,49 +82,75 @@ class _UsersPageState extends State<UsersPage> {
 
           List<Map<String, dynamic>> users = snapshot.data!;
 
-          return SingleChildScrollView(
-            padding: const EdgeInsets.all(8.0),
-            child: Column(
-              children: [
-                DataTable(
-                  columnSpacing: 16.0,
-                  headingRowHeight: 56.0,
-                  columns: <DataColumn>[
-  DataColumn(
-    label: Text(
-      'Username',
-      style: TextStyle(fontSize: MediaQuery.of(context).size.width * 0.01),
-    ),
-  ),
-  DataColumn(
-    label: Text(
-      'Email',
-      style: TextStyle(fontSize: MediaQuery.of(context).size.width * 0.01),
-    ),
-  ),
-  DataColumn(
-    label: Text(
-      'Address',
-      style: TextStyle(fontSize: MediaQuery.of(context).size.width * 0.01),
-    ),
-  ),
-  DataColumn(
-    label: Text(
-      'Created At',
-      style: TextStyle(fontSize: MediaQuery.of(context).size.width * 0.01),
-    ),
-  ),
-  DataColumn(
-    label: Text(
-      'Actions',
-      style: TextStyle(fontSize: MediaQuery.of(context).size.width * 0.01),
-    ),
-  ),
-],
-
-                  rows: users
-                      .map(
-                        (user) => DataRow(
+          return LayoutBuilder(
+            builder: (context, constraints) {
+              bool isWideScreen = constraints.maxWidth > 600;
+              return SingleChildScrollView(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                  children: [
+                    DataTable(
+                      columnSpacing: isWideScreen ? 24.0 : 12.0,
+                      headingRowHeight: 56.0,
+                      columns: <DataColumn>[
+                        DataColumn(
+                          label: Flexible(
+                            child: Text(
+                              'Username',
+                              style: TextStyle(
+                                fontSize: isWideScreen ? 16 : 12,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ),
+                        DataColumn(
+                          label: Flexible(
+                            child: Text(
+                              'Email',
+                              style: TextStyle(
+                                fontSize: isWideScreen ? 16 : 12,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ),
+                        DataColumn(
+                          label: Flexible(
+                            child: Text(
+                              'Address',
+                              style: TextStyle(
+                                fontSize: isWideScreen ? 16 : 12,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ),
+                        DataColumn(
+                          label: Flexible(
+                            child: Text(
+                              'Created At',
+                              style: TextStyle(
+                                fontSize: isWideScreen ? 16 : 12,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ),
+                        DataColumn(
+                          label: Flexible(
+                            child: Text(
+                              'Actions',
+                              style: TextStyle(
+                                fontSize: isWideScreen ? 16 : 12,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                      rows: users.map((user) {
+                        return DataRow(
                           cells: <DataCell>[
                             DataCell(Text(user['username'] ?? 'No username')),
                             DataCell(Text(user['email'] ?? 'No email')),
@@ -136,49 +162,26 @@ class _UsersPageState extends State<UsersPage> {
                                   IconButton(
                                     icon: const Icon(Icons.edit),
                                     onPressed: () {
-                                      // Example: Show dialog to update user data
                                       _showEditUserDialog(user);
                                     },
                                   ),
                                   IconButton(
                                     icon: const Icon(Icons.delete),
                                     onPressed: () {
-                                      showDialog(
-                                        context: context,
-                                        builder: (BuildContext context) {
-                                          return AlertDialog(
-                                            title: const Text('Delete User'),
-                                            content: const Text('Are you sure you want to delete this user?'),
-                                            actions: <Widget>[
-                                              TextButton(
-                                                onPressed: () {
-                                                  Navigator.of(context).pop();
-                                                },
-                                                child: const Text('Cancel'),
-                                              ),
-                                              TextButton(
-                                                onPressed: () {
-                                                  deleteUser(user['id']);
-                                                  Navigator.of(context).pop();
-                                                },
-                                                child: const Text('Delete'),
-                                              ),
-                                            ],
-                                          );
-                                        },
-                                      );
+                                      _showDeleteDialog(user['id']);
                                     },
                                   ),
                                 ],
                               ),
                             ),
                           ],
-                        ),
-                      )
-                      .toList(),
+                        );
+                      }).toList(),
+                    ),
+                  ],
                 ),
-              ],
-            ),
+              );
+            },
           );
         },
       ),
@@ -203,21 +206,23 @@ class _UsersPageState extends State<UsersPage> {
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text('Edit User'),
-          content: Column(
-            children: [
-              TextField(
-                controller: usernameController,
-                decoration: const InputDecoration(labelText: 'Username'),
-              ),
-              TextField(
-                controller: emailController,
-                decoration: const InputDecoration(labelText: 'Email'),
-              ),
-              TextField(
-                controller: addressController,
-                decoration: const InputDecoration(labelText: 'Address'),
-              ),
-            ],
+          content: SingleChildScrollView(
+            child: Column(
+              children: [
+                TextField(
+                  controller: usernameController,
+                  decoration: const InputDecoration(labelText: 'Username'),
+                ),
+                TextField(
+                  controller: emailController,
+                  decoration: const InputDecoration(labelText: 'Email'),
+                ),
+                TextField(
+                  controller: addressController,
+                  decoration: const InputDecoration(labelText: 'Address'),
+                ),
+              ],
+            ),
           ),
           actions: <Widget>[
             TextButton(
@@ -228,17 +233,44 @@ class _UsersPageState extends State<UsersPage> {
             ),
             TextButton(
               onPressed: () {
-                // Update the user in Firestore
                 Map<String, dynamic> updatedData = {
                   'username': usernameController.text,
                   'email': emailController.text,
                   'address': addressController.text,
-                  'createdAt': user['createdAt'], // Keep the original createdAt
+                  'createdAt': user['createdAt'],
                 };
                 updateUser(user['id'], updatedData);
                 Navigator.of(context).pop();
               },
               child: const Text('Save'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  // Function to show a delete confirmation dialog
+  void _showDeleteDialog(String userId) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Delete User'),
+          content: const Text('Are you sure you want to delete this user?'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                deleteUser(userId);
+                Navigator.of(context).pop();
+              },
+              child: const Text('Delete'),
             ),
           ],
         );

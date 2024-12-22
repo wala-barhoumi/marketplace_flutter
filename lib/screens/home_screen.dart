@@ -21,7 +21,7 @@ class _HomeScreenState extends State<HomeScreen> {
   final List<Widget> _screens = [
     const HomeContentScreen(),
     FavoritesScreen(),
-     CartScreen(),
+    CartScreen(),
     const ProfileScreen(),
   ];
 
@@ -31,35 +31,35 @@ class _HomeScreenState extends State<HomeScreen> {
     _fetchAddress();
   }
 
-Future<void> _fetchAddress() async {
-  try {
-    final currentUser = FirebaseAuth.instance.currentUser;
-    if (currentUser == null) {
-      if (mounted) {
-        setState(() => deliveryAddress = 'Utilisateur non connecté');
+  Future<void> _fetchAddress() async {
+    try {
+      final currentUser = FirebaseAuth.instance.currentUser;
+      if (currentUser == null) {
+        if (mounted) {
+          setState(() => deliveryAddress = 'Utilisateur non connecté');
+        }
+        return;
       }
-      return;
-    }
 
-    final userDoc = await FirebaseFirestore.instance
-        .collection('users')
-        .doc(currentUser.uid)
-        .get();
+      final userDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(currentUser.uid)
+          .get();
 
-    if (mounted) {
-      setState(() {
-        deliveryAddress = userDoc.exists
-            ? (userDoc['address'] ?? 'Adresse non disponible')
-            : 'Adresse introuvable';
-      });
+      if (mounted) {
+        setState(() {
+          deliveryAddress = userDoc.exists
+              ? (userDoc['address'] ?? 'Adresse non disponible')
+              : 'Adresse introuvable';
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => deliveryAddress = 'Erreur de chargement de l\'adresse');
+      }
+      debugPrint('Erreur lors de la récupération de l\'adresse : $e');
     }
-  } catch (e) {
-    if (mounted) {
-      setState(() => deliveryAddress = 'Erreur de chargement de l\'adresse');
-    }
-    debugPrint('Erreur lors de la récupération de l\'adresse : $e');
   }
-}
 
   @override
   Widget build(BuildContext context) {
@@ -240,7 +240,8 @@ class _HomeContentScreenState extends State<HomeContentScreen> {
         final filteredProducts = products.where((product) {
           final name = product['name'] ?? '';
           return name.toLowerCase().contains(searchQuery.toLowerCase());
-        }).toList();
+        }
+        ).toList();
 
         return filteredProducts.isEmpty
             ? const Center(child: Text('Aucun produit trouvé'))
@@ -267,154 +268,163 @@ class _HomeContentScreenState extends State<HomeContentScreen> {
     );
   }
 
-Widget _buildProductCard(String name, String image, String price, String productId) {
-  return GestureDetector(
-    onTap: () {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => ProductDetailsScreen(productId: productId),
+  Widget _buildProductCard(String name, String image, String price, String productId) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ProductDetailsScreen(productId: productId),
+          ),
+        );
+      },
+      child: Card(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        child: Column(
+          children: [
+            Expanded(
+              child: image.isNotEmpty //&& (image.startsWith('http') || image.startsWith('data:image'))
+                  ? (!image.startsWith('data:image')
+                      ? Image.memory(
+                          base64Decode(image),
+                          width: 100,
+                          height: 100,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            print("########################################");
+                            print(error);
+                            return const Icon(Icons.image_not_supported, size: 50);
+                          },
+                        )
+                      : Image.network(
+                          image,
+                          width: 100,
+                          height: 100,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                             print("++++++++++++++++++++++++++++++++++++");
+                            print(error);
+                            return const Icon(Icons.image_not_supported, size: 50);
+                          },
+                        ))
+                  : const Icon(Icons.image_not_supported, size: 50),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(6),
+              child: Text(
+                name,
+                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(6),
+              child: Text(
+                '$price DT',
+                style: const TextStyle(fontSize: 10, color: Colors.grey),
+              ),
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                IconButton(
+                  onPressed: () {
+                    _toggleFavorite(productId,name,price,image);
+                  },
+                  icon: const Icon(Icons.favorite_border, size: 24, color: Colors.red),
+                ),
+                IconButton(
+                  onPressed: () {
+                    _addToCart(productId);
+                  },
+                  icon: const Icon(Icons.card_giftcard, size: 24, color: Colors.blue),
+                ),
+              ],
+            )
+          ],
         ),
-      );
-    },
-    child: Card(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-      child: Column(
-        children: [
-          Expanded(
-            child: image.isNotEmpty && (image.startsWith('http') || image.startsWith('data:image'))
-                ? (image.startsWith('data:image')
-                    ? Image.memory(
-                        base64Decode(cleanBase64(image)),
-                        width: double.infinity,
-                        height: 100,
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) {
-                          return const Icon(Icons.image_not_supported, size: 50);
-                        },
-                      )
-                    : Image.network(
-                        image,
-                        width: double.infinity,
-                        height: 100,
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) {
-                          return const Icon(Icons.image_not_supported, size: 50);
-                        },
-                      ))
-                : const Icon(Icons.image_not_supported, size: 50),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(6),
-            child: Text(
-              name,
-              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(6),
-            child: Text(
-              '$price DT',
-              style: const TextStyle(fontSize: 10, color: Colors.grey),
-            ),
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              IconButton(
-                onPressed: () {
-                  _toggleFavorite(productId);
-                },
-                icon: const Icon(Icons.favorite_border, size: 24, color: Colors.red),
-              ),
-              IconButton(
-                onPressed: () {
-                  _addToCart(productId);
-                },
-                icon: const Icon(Icons.card_giftcard, size: 24, color: Colors.blue),
-              ),
-            ],
-          )
-        ],
       ),
-    )
-     );
-  }
-
- void _toggleFavorite(String productId) async {
-  final currentUser = FirebaseAuth.instance.currentUser;
-
-  if (currentUser == null) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Veuillez vous connecter pour ajouter aux favoris')),
-    );
-    return;
-  }
-
-  final favoritesRef = FirebaseFirestore.instance
-      .collection('users')
-      .doc(currentUser.uid)
-      .collection('favorites');
-
-  final doc = await favoritesRef.doc(productId).get();
-
-  if (doc.exists) {
-    await favoritesRef.doc(productId).delete();
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Produit retiré des favoris')),
-    );
-  } else {
-    await favoritesRef.doc(productId).set({
-      'productId': productId,
-      'timestamp': FieldValue.serverTimestamp(),
-    });
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Produit ajouté aux favoris')),
     );
   }
-}
 
- void _addToCart(String productId) async {
-  final currentUser = FirebaseAuth.instance.currentUser;
+  void _toggleFavorite(String productId,String name , String price, String image ) async {
+    final currentUser = FirebaseAuth.instance.currentUser;
 
-  if (currentUser == null) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Veuillez vous connecter pour ajouter au panier')),
-    );
-    return;
+    if (currentUser == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Veuillez vous connecter pour ajouter aux favoris')),
+      );
+      return;
+    }
+
+    final favoritesRef = FirebaseFirestore.instance
+        .collection('users')
+        .doc(currentUser.uid)
+        .collection('favorites');
+
+    final doc = await favoritesRef.doc(productId).get();
+
+    if (doc.exists) {
+      await favoritesRef.doc(productId).delete();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Produit retiré des favoris')),
+      );
+    } else {
+      await favoritesRef.doc(productId).set({
+        'productId': productId,
+        'timestamp': FieldValue.serverTimestamp(),
+        'name': name,
+        'image':image,
+        'price': price,
+    
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Produit ajouté aux favoris')),
+      );
+    }
   }
 
-  final cartRef = FirebaseFirestore.instance
-      .collection('users')
-      .doc(currentUser.uid)
-      .collection('cart');
+  void _addToCart(String productId) async {
+    final currentUser = FirebaseAuth.instance.currentUser;
 
-  final doc = await cartRef.doc(productId).get();
+    if (currentUser == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Veuillez vous connecter pour ajouter au panier')),
+      );
+      return;
+    }
 
-  if (doc.exists) {
-    await cartRef.doc(productId).update({
-      'quantity': FieldValue.increment(1),
-    });
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Quantité du produit augmentée')),
-    );
-  } else {
-    await cartRef.doc(productId).set({
-      'productId': productId,
-      'quantity': 1,
-      'timestamp': FieldValue.serverTimestamp(),
-    });
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Produit ajouté au panier')),
-    );
+    final cartRef = FirebaseFirestore.instance
+        .collection('users')
+        .doc(currentUser.uid)
+        .collection('cart');
+
+    final doc = await cartRef.doc(productId).get();
+
+    if (doc.exists) {
+      await cartRef.doc(productId).update({
+        'quantity': FieldValue.increment(1),
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Quantité du produit augmentée')),
+      );
+    } else {
+      await cartRef.doc(productId).set({
+        'productId': productId,
+        'quantity': 1,
+        'timestamp': FieldValue.serverTimestamp(),
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Produit ajouté au panier')),
+      );
+    }
   }
-}
-
 }
 
 String cleanBase64(String base64String) {
-  if (base64String.startsWith('data:image')) {
+   print(" base64String");
+   print(base64String);
+  if (!base64String.startsWith('data:image')) {
     final parts = base64String.split(',');
     return parts.length > 1 ? parts[1] : '';
   }

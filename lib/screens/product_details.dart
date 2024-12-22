@@ -68,10 +68,12 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Product Details'),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () =>  Navigator.pop(context),
-        ),
+       leading: IconButton(
+    icon: const Icon(Icons.arrow_back),
+    onPressed: () {
+      Navigator.of(context).pop(); 
+    },
+  ),
       ),
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
