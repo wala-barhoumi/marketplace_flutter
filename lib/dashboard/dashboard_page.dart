@@ -1,41 +1,36 @@
+import 'package:async/async.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fl_chart/fl_chart.dart';
 
 class DashboardPage extends StatelessWidget {
   const DashboardPage({super.key});
+  Stream<Map<String, int>> getStatsStream() {
+    final userStream = FirebaseFirestore.instance.collection('users').snapshots().map((snapshot) => snapshot.size);
+    final productStream = FirebaseFirestore.instance.collection('products').snapshots().map((snapshot) => snapshot.size);
+    final orderStream = FirebaseFirestore.instance.collection('orders').snapshots().map((snapshot) => snapshot.size);
 
-  // This method counts the documents in a Firestore collection
-  Future<int> getDocumentCount(String collectionName) async {
-    // Reference to the Firestore collection
-    CollectionReference collectionRef = FirebaseFirestore.instance.collection(collectionName);
-
-    // Fetch the documents from the collection
-    QuerySnapshot snapshot = await collectionRef.get();
-
-    // Return the number of documents in the collection
-    return snapshot.size;
+    return StreamZip([userStream, productStream, orderStream]).map((values) {
+      return {
+        'users': values[0],
+        'products': values[1],
+        'orders': values[2],
+      };
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFFF5F5F5), 
       appBar: AppBar(
-        title: const Text('Admin Dashboard'),
+        backgroundColor: const Color(0xFFFFFFFF),
+        title: const Text('Admin Dashboard', style: TextStyle(color: Colors.black)),
+        iconTheme: const IconThemeData(color: Colors.black),
+        elevation: 1,
       ),
-      body: FutureBuilder<Map<String, int>>(
-        // Fetch the statistics dynamically
-        future: Future.wait([
-          getDocumentCount('users'),
-          getDocumentCount('products'),
-          getDocumentCount('orders'),
-        ]).then((values) {
-          return {
-            'users': values[0] as int,
-            'products': values[1] as int,
-            'orders': values[2] as int,
-          };
-        }),
+      body: StreamBuilder<Map<String, int>>(
+        stream: getStatsStream(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
@@ -45,23 +40,21 @@ class DashboardPage extends StatelessWidget {
             final stats = snapshot.data!;
 
             return Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Statistics Cards
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      _buildStatCard('Users', stats['users'] ?? 0),
-                      _buildStatCard('Products', stats['products'] ?? 0),
-                      _buildStatCard('Orders', stats['orders'] ?? 0),
-                    ],
-                  ),
-                  const SizedBox(height: 20),
-                  // Chart to visualize the stats
-                  _buildStatsChart(stats),
-                ],
+              padding: const EdgeInsets.all(8.0),
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        _buildStatCard('Users', stats['users'] ?? 0, const Color(0xFF3AB4F2)),
+                        _buildStatCard('Products', stats['products'] ?? 0, const Color(0xFFF2C94C)),
+                        _buildStatCard('Orders', stats['orders'] ?? 0, const Color(0xFF27AE60)),
+                      ],
+                    ),
+                  ],
+                ),
               ),
             );
           } else {
@@ -72,78 +65,67 @@ class DashboardPage extends StatelessWidget {
     );
   }
 
-  // Helper function to create a stat card
-  Widget _buildStatCard(String title, int value) {
-    return Card(
-      elevation: 5,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: Padding(
+  Widget _buildStatCard(String title, int value, Color color) {
+    return Expanded(
+      child: Container(
+        margin: const EdgeInsets.all(8.0),
         padding: const EdgeInsets.all(16.0),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              title,
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              '$value',
-              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.2),
+              spreadRadius: 2,
+              blurRadius: 5,
+              offset: const Offset(0, 3),
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  // Helper function to create the stats chart using FL Chart
-  Widget _buildStatsChart(Map<String, int> stats) {
-    return AspectRatio(
-      aspectRatio: 1.3,
-      child: BarChart(
-        BarChartData(
-          borderData: FlBorderData(show: false),
-          gridData: FlGridData(show: false),
-          titlesData: FlTitlesData(show: false),
-          barGroups: [
-            BarChartGroupData(
-              x: 0,
-              barRods: [
-                BarChartRodData(
-                  y: stats['users']!.toDouble(),
-                  rodStackItems: [
-                    BarChartRodStackItem(0, stats['users']!.toDouble(), Colors.blue),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            SizedBox(
+              height: 100,
+              width: 100,
+              child: PieChart(
+                PieChartData(
+                  sections: [
+                    PieChartSectionData(
+                      value: value.toDouble(),
+                      color: color,
+                      radius: 50,
+                      title: '',
+                    ),
+                    PieChartSectionData(
+                      value: 100 - value.toDouble(),
+                      color: Colors.grey[200],
+                      radius: 50,
+                      title: '',
+                    ),
                   ],
-                  width: 30,
+                  sectionsSpace: 0,
+                  centerSpaceRadius: 30,
                 ),
-              ],
+              ),
             ),
-            BarChartGroupData(
-              x: 1,
-              barRods: [
-                BarChartRodData(
-                  y: stats['products']!.toDouble(),
-                  rodStackItems: [
-                    BarChartRodStackItem(0, stats['products']!.toDouble(), Colors.green),
-                  ],
-                  width: 30,
-                ),
-              ],
+            const SizedBox(height: 10),
+            Text(
+              title,
+              style: const TextStyle(
+                color: Colors.black87,
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+              ),
             ),
-            BarChartGroupData(
-              x: 2,
-              barRods: [
-                BarChartRodData(
-                  y: stats['orders']!.toDouble(),
-                  rodStackItems: [
-                    BarChartRodStackItem(0, stats['orders']!.toDouble(), Colors.red),
-                  ],
-                  width: 30,
-                ),
-              ],
+            const SizedBox(height: 10),
+            Text(
+              '$value',
+              style: TextStyle(
+                color: color,
+                fontSize: 28,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ],
         ),

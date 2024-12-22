@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:app/dashboard/dashboard_page.dart';
 import 'package:app/dashboard/users_page.dart';
 import 'package:app/dashboard/settings_page.dart';
-import 'package:app/dashboard/products_page.dart'; // Make sure this import is correct
+import 'package:app/dashboard/products_page.dart'; 
+import 'package:app/dashboard/orders_page.dart';
 
 class Sidebar extends StatelessWidget {
   final Function(Widget) onPageChange;
@@ -31,6 +32,11 @@ class Sidebar extends StatelessWidget {
             icon: const Icon(Icons.shopping_bag, color: Colors.white),
             onPressed: () => onPageChange(const ProductPage()), // Update this line
             tooltip: 'Products',
+          ),
+          IconButton(
+            icon: const Icon(Icons.shopping_cart, color: Colors.white),
+            onPressed: () => onPageChange(const OrdersPage()),
+            tooltip: 'orders',
           ),
           IconButton(
             icon: const Icon(Icons.settings, color: Colors.white),
