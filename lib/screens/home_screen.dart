@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:app/screens/product_details.dart';
 import 'profile_screen.dart';
 import 'cart_screen.dart';
 import 'favorites_screen.dart';
@@ -95,6 +96,7 @@ class HomeContentScreen extends StatefulWidget {
 
 class _HomeContentScreenState extends State<HomeContentScreen> {
   String searchQuery = '';
+
 
   @override
   Widget build(BuildContext context) {
@@ -335,7 +337,7 @@ class _HomeContentScreenState extends State<HomeContentScreen> {
                 ),
                 IconButton(
                   onPressed: () {
-                    _addToCart(productId,name,price,image);
+                 _addToCart(productId,name,price,image);
                   },
                   icon: const Icon(Icons.card_giftcard, size: 24, color: Colors.blue),
                 ),
@@ -415,11 +417,12 @@ class _HomeContentScreenState extends State<HomeContentScreen> {
   } else {
     await cartRef.doc(productId).set({
       'productId': productId,
-      'quantity': 1,
+      'quantity':1,
       'timestamp': FieldValue.serverTimestamp(),
       'name': name,
       'image': image,
       'price': price,
+      
     });
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(

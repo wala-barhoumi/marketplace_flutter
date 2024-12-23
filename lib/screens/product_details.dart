@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'package:app/screens/home_screen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -20,6 +20,8 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
   late String productCategory = '';
   late String productImage = '';
   bool isLoading = true;
+
+  final TextEditingController _commentController = TextEditingController();
 
   @override
   void initState() {
@@ -56,10 +58,108 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
       setState(() {
         isLoading = false;
       });
-      print('Error fetching product details: $e');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Failed to fetch product details: $e')),
       );
+    }
+  }
+
+  Future<void> _addComment(String comment) async {
+    if (comment.isEmpty) return;
+    try {
+      // Get the current user's ID
+      final currentUser = FirebaseAuth.instance.currentUser;
+      if (currentUser != null) {
+        await FirebaseFirestore.instance
+            .collection('products')
+            .doc(widget.productId)
+            .collection('comments')
+            .add({
+          'text': comment,
+          'timestamp': FieldValue.serverTimestamp(),
+          'userId': currentUser.uid,  // Add the userId field
+        });
+        _commentController.clear();
+        setState(() {});
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Please log in to add a comment')),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to add comment: $e')),
+      );
+    }
+  }
+
+  Widget _buildCommentsSection() {
+    return StreamBuilder<QuerySnapshot>(
+      stream: FirebaseFirestore.instance
+          .collection('products')
+          .doc(widget.productId)
+          .collection('comments')
+          .orderBy('timestamp', descending: true)
+          .snapshots(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const CircularProgressIndicator();
+        }
+
+        if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+          return const Text('No comments yet.');
+        }
+        return ListView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          itemCount: snapshot.data!.docs.length,
+          itemBuilder: (context, index) {
+            final commentData = snapshot.data!.docs[index];
+            final commentText = commentData['text'];
+            final userId = commentData['userId'];
+            
+
+            return FutureBuilder<DocumentSnapshot>(
+              future: FirebaseFirestore.instance.collection('users').doc(userId).get(),
+              builder: (context, userSnapshot) {
+                if (userSnapshot.connectionState == ConnectionState.waiting) {
+                  return const CircularProgressIndicator();
+                }
+                if (!userSnapshot.hasData || !userSnapshot.data!.exists) {
+                  return ListTile(
+                    title: Text(commentText),
+                    subtitle: const Text('Unknown user'),
+                  );
+                }
+                final userData = userSnapshot.data!;
+                final userName = userData['username'] ?? 'Anonymous'; // Adjust field as needed
+                return ListTile(
+                  title: Text(commentText),
+                  subtitle: Text('by $userName'),
+                );
+              },
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Widget _buildProductImage() {
+    if (productImage.isEmpty) {
+      return const Icon(Icons.image_not_supported, size: 100);
+    }
+
+    try {
+      final decodedBytes = base64Decode(productImage);
+      return Image.memory(
+        decodedBytes,
+        width: 100,
+        height: 200,
+        fit: BoxFit.cover,
+      );
+    } catch (e) {
+      return const Icon(Icons.broken_image, size: 100);
     }
   }
 
@@ -68,112 +168,88 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Product Details'),
-       leading: IconButton(
-    icon: const Icon(Icons.arrow_back),
-    onPressed: () {
-      Navigator.of(context).pop(); 
-    },
-  ),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+        ),
       ),
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
-          : Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Card(
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          : SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
                 child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Expanded(
-                      flex: 3,
-                      child: productImage.isNotEmpty
-                          ? (productImage.startsWith('data:image')
-                              ? Image.memory(
-                                  base64Decode(cleanBase64(productImage)),
-                                  width: double.infinity,
-                                  height: 200,
-                                  fit: BoxFit.cover,
-                                  errorBuilder: (context, error, stackTrace) {
-                                    return const Icon(Icons.image_not_supported, size: 50);
-                                  },
-                                )
-                              : Image.network(
-                                  productImage,
-                                  width: double.infinity,
-                                  height: 200,
-                                  fit: BoxFit.cover,
-                                  errorBuilder: (context, error, stackTrace) {
-                                    return const Icon(Icons.image_not_supported, size: 50);
-                                  },
-                                ))
-                          : const Icon(Icons.image_not_supported, size: 50),
+                    _buildProductImage(),
+                    const SizedBox(height: 16),
+                    Text(
+                      productName,
+                      style: const TextStyle(
+                          fontWeight: FontWeight.bold, fontSize: 24),
                     ),
-                    Padding(
-                      padding: const EdgeInsets.all(12),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            productName,
-                            style: const TextStyle(
-                                fontWeight: FontWeight.bold, fontSize: 16),
-                            overflow: TextOverflow.ellipsis,
+                    const SizedBox(height: 8),
+                    Text(
+                      '$productPrice DT',
+                      style:
+                          const TextStyle(fontSize: 18, color: Colors.green),
+                    ),
+                    const SizedBox(height: 8),
+                    Text('$productStock in stock',
+                        style: const TextStyle(fontSize: 14, color: Colors.grey)),
+                    const SizedBox(height: 16),
+                    const Text(
+                      'Details:',
+                      style:
+                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    ),
+                    Text(
+                      productDescription,
+                      style: const TextStyle(fontSize: 14, color: Colors.grey),
+                    ),
+                    const Divider(height: 32),
+                    const Text(
+                      'Comments:',
+                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    ),
+                    _buildCommentsSection(),
+                    const SizedBox(height: 16),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: TextField(
+                            controller: _commentController,
+                            decoration: const InputDecoration(
+                              labelText: 'Add a comment',
+                              border: OutlineInputBorder(),
+                            ),
                           ),
-                          const SizedBox(height: 4),
-                          Text(
-                            '$productPrice DT',
-                            style: const TextStyle(fontSize: 14, color: Colors.green),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            '$productStock in stock',
-                            style: const TextStyle(fontSize: 12, color: Colors.grey),
-                          ),
-                          const SizedBox(height: 8),
-                          const Text(
-                            'Details:',
-                            style: TextStyle(
-                                fontSize: 14, fontWeight: FontWeight.bold),
-                          ),
-                          Text(
-                            productDescription,
-                            style: const TextStyle(fontSize: 12, color: Colors.grey),
-                            maxLines: 3,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ],
+                        ),
+                        const SizedBox(width: 8),
+                        ElevatedButton(
+                          onPressed: () => _addComment(_commentController.text),
+                          child: const Text('Post'),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    ElevatedButton(
+                      onPressed: () {
+                        // Add to cart functionality
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.purple,
+                        minimumSize: const Size.fromHeight(50),
                       ),
-                    ),
-                    const Divider(),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          IconButton(
-                            onPressed: () {
-                              _toggleFavorite(widget.productId);
-                            },
-                            icon: const Icon(
-                              Icons.favorite_border,
-                              size: 28,
-                              color: Colors.red,
-                            ),
-                          ),
-                          ElevatedButton(
-                            onPressed: () {
-                              _addToCart(widget.productId);
-                            },
-                            child: const Text(
-                              'Add To Cart',
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.blue),
-                          ),
-                        ],
+                      child: const Text(
+                        'Add To Cart',
+                        style:
+                        TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
                   ],
@@ -181,21 +257,5 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
               ),
             ),
     );
-  }
-
-  void _toggleFavorite(String productId) async {
-    // Implement your logic for toggling favorites here
-  }
-
-  void _addToCart(String productId) async {
-    // Implement your logic for adding to cart here
-  }
-
-  String cleanBase64(String base64String) {
-    if (base64String.startsWith('data:image')) {
-      final parts = base64String.split(',');
-      return parts.length > 1 ? parts[1] : '';
-    }
-    return base64String;
   }
 }

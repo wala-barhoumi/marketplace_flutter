@@ -26,6 +26,7 @@ void main() async {void main() async {
       debugPrint('Firebase initialized for web');
     } else {
       // Firebase initialization for mobile
+      
       await Firebase.initializeApp();
       debugPrint('Firebase initialized for mobile');
     }

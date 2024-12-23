@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:app/firestore_services.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:app/screens/product_details.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class CartScreen extends StatelessWidget {
@@ -41,11 +42,12 @@ class CartScreen extends StatelessWidget {
               final productId = data['productId']; 
               final name = data['name'] ?? 'Unknown product';
               final price = data['price'] ?? 'Unknown price';
+              final quantity = data['quantity'];
               final image = base64Decode(data['image'] ?? '');
 
               return ListTile(
                 title: Text(name),
-                subtitle: Text(price),
+                subtitle: Text('$price\nQuantity: $quantity'),
                 leading: image.isNotEmpty
                     ? Image.memory(image, width: 50, height: 50, fit: BoxFit.cover)
                     : Icon(Icons.image, size: 50),
@@ -73,55 +75,3 @@ class CartScreen extends StatelessWidget {
   }
 }
 
-class ProductDetailsScreen extends StatelessWidget {
-  final String productId;
-  const ProductDetailsScreen({required this.productId});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text('Product Details')),
-      body: FutureBuilder<DocumentSnapshot>(
-        future: FirestoreService().fetchProductDetails(productId), // Fetch product details using FirestoreService
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
-          }
-          if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
-          }
-
-          final productData = snapshot.data?.data() as Map<String, dynamic>?;
-          if (productData == null) {
-            return Center(child: Text('Product not found'));
-          }
-
-          final name = productData['name'];
-          final price = productData['price'];
-          final image = productData['image'];
-          final description = productData['description'];
-
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Image.network(image ?? '', height: 250, width: double.infinity, fit: BoxFit.cover),
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(name ?? 'Unknown product', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
-                    SizedBox(height: 8),
-                    Text('\$${price ?? 'Unknown price'}', style: TextStyle(fontSize: 18, color: Colors.green)),
-                    SizedBox(height: 8),
-                    Text(description ?? 'No description available', style: TextStyle(fontSize: 16)),
-                  ],
-                ),
-              ),
-            ],
-          );
-        },
-      ),
-    );
-  }
-}
