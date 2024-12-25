@@ -1,0 +1,40 @@
+name: Test CI/CD Workflow
+
+# Déclenchement : sur chaque push dans la branche principale
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  test-pipeline:
+    name: Test CI/CD
+    runs-on: ubuntu-latest
+
+    steps:
+      # Étape 1 : Cloner le dépôt
+      - name: Cloner le dépôt
+        uses: actions/checkout@v4
+
+      # Étape 2 : Afficher un message de démarrage
+      - name: Affichage - Début du workflow
+        run: echo "🚀 Début du pipeline CI/CD !"
+
+      # Étape 3 : Simuler des tests unitaires
+      - name: Simulation des tests unitaires
+        run: |
+          echo "✅ Test 1 : Réussi"
+          echo "✅ Test 2 : Réussi"
+          echo "✅ Test 3 : Réussi"
+
+      # Étape 4 : Simuler une étape de build
+      - name: Simulation du build
+        run: echo "📦 Build terminé avec succès !"
+
+      # Étape 5 : Simuler un déploiement
+      - name: Simulation du déploiement
+        run: echo "🚀 Application déployée (simulation) avec succès !"
+
+      # Étape 6 : Afficher un message de fin
+      - name: Affichage - Fin du workflow
+        run: echo "🎉 Fin du pipeline CI/CD ! Tout s'est bien passé."
